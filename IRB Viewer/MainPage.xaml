@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="IRB_Viewer.MainPage"
+             Shell.NavBarIsVisible="False">
+    <ScrollView VerticalOptions="Fill" HorizontalOptions="Fill" Orientation="Both">
+        <VerticalStackLayout VerticalOptions="Fill">
+            <HorizontalStackLayout>
+                <ImageButton x:Name="PbOpen" Source="file_open_gray.png" Aspect="AspectFit"
+                             HeightRequest="30" WidthRequest="30" Margin="10"
+                             Clicked="PbOpen_OnClicked"/>
+                <ImageButton x:Name="PbZoomIn" Source="zoom_in_gray.png" Aspect="AspectFit"
+                             HeightRequest="30" WidthRequest="30" Margin="10"
+                             Clicked="PbZoomIn_OnClicked"/>
+                <ImageButton x:Name="PbZoomOut" Source="zoom_out_gray.png" Aspect="AspectFit"
+                             HeightRequest="30" WidthRequest="30" Margin="10"
+                             Clicked="PbZoomOut_OnClicked"/>
+                
+                <ImageButton x:Name="PbGotoFirst" Source="first_page_gray.png" Aspect="AspectFit"
+                             HeightRequest="30" WidthRequest="30" Margin="10"
+                             Clicked="PbGotoFirst_OnClicked"/>
+                <ImageButton x:Name="PbGotoPrevious" Source="chevron_backward_gray.png" Aspect="AspectFit"
+                             HeightRequest="30" WidthRequest="30" Margin="10"
+                             Clicked="PbGotoPrevious_OnClicked"/>
+                <ImageButton x:Name="PbGotoNext" Source="chevron_forward_gray.png" Aspect="AspectFit"
+                             HeightRequest="30" WidthRequest="30" Margin="10"
+                             Clicked="PbGotoNext_OnClicked"/>
+                <ImageButton x:Name="PbGotoLast" Source="last_page_gray.png" Aspect="AspectFit"
+                             HeightRequest="30" WidthRequest="30" Margin="10"
+                             Clicked="PbGotoLast_OnClicked"/>
+                <Label x:Name="LblFrameNumber"
+                       VerticalOptions="Center"
+                       FontFamily="OpenSansRegular"
+                       FontSize="20"
+                       Margin="10" />
+                <Label x:Name="LblScale"
+                       VerticalOptions="Center"
+                       FontFamily="OpenSansRegular"
+                       FontSize="20"
+                       Margin="10" />
+                
+            </HorizontalStackLayout>
+            <GraphicsView x:Name="GraphicsView"
+                          HeightRequest="0"
+                          WidthRequest="0"
+                          AnchorX="0" AnchorY="0"/>
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>
