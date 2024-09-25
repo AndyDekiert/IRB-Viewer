@@ -1,6 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:colorMapping="using:IRB_Viewer.ColorMapping"
              x:Class="IRB_Viewer.MainPage"
              Shell.NavBarIsVisible="False">
     <ScrollView VerticalOptions="Fill" HorizontalOptions="Fill" Orientation="Both">
@@ -38,11 +39,33 @@
                        FontFamily="OpenSansRegular"
                        FontSize="20"
                        Margin="10" />
+                <Label x:Name="LblRange"
+                       VerticalOptions="Center"
+                       FontFamily="OpenSansRegular"
+                       FontSize="20"
+                       Margin="10" />
                 
+                <HorizontalStackLayout x:Name="CtGradient" Spacing="5" Margin="10" VerticalOptions="Center">
+                    <Entry x:Name="TxtMinValue" Keyboard="Numeric"
+                           HeightRequest="30" WidthRequest="50"
+                           Completed="TxtMinValue_OnCompleted"/>
+                    <colorMapping:ColorGradientView x:Name="ColorGradientView"
+                        VerticalOptions="Center"
+                        HeightRequest="30"
+                        WidthRequest="200"/>
+                    <Entry x:Name="TxtMaxValue" Keyboard="Numeric"
+                           HeightRequest="30" WidthRequest="50"
+                           Completed="TxtMaxValue_OnCompleted"/>
+                    <Picker x:Name="PickerGradient" HeightRequest="30"
+                            SelectedIndexChanged="PickerGradient_OnSelectedIndexChanged"/>
+                </HorizontalStackLayout>
             </HorizontalStackLayout>
+            
+            <Frame BackgroundColor="SlateGray" HeightRequest="1" HorizontalOptions="Fill" />
+            
             <GraphicsView x:Name="GraphicsView"
-                          HeightRequest="0"
-                          WidthRequest="0"
+                          HeightRequest="0" WidthRequest="0"
+                          Scale="1.5"
                           AnchorX="0" AnchorY="0"/>
         </VerticalStackLayout>
     </ScrollView>

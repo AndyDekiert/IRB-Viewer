@@ -1,16 +1,44 @@
-﻿namespace IRB_Viewer;
+﻿using System.Diagnostics.CodeAnalysis;
+using IRB_Viewer.ColorMapping;
+
+namespace IRB_Viewer;
 
 public partial class MainPage : ContentPage {
     private IrbFileFormat.IrbImg? imgStream;
+    
     private int frameIndex;
     private int frameCount;
+    private float minValue;
+    private float maxValue;
+    
+    private float scaleMinValue = -1;
+    private float scaleMaxValue = -1;
 
     private readonly IrDrawable irDrawable = new();
+
+    private readonly Dictionary<string, ColorGradient> colorGradients = new([
+        new KeyValuePair<string, ColorGradient>("Black White", new ColorGradient([
+            new ColorGradient.ColorStop(0, Colors.Black),
+            new ColorGradient.ColorStop(255, Colors.White)
+        ])),
+        new KeyValuePair<string, ColorGradient>("Blue Red", new ColorGradient([
+            new ColorGradient.ColorStop(0, Colors.Blue),
+            new ColorGradient.ColorStop(0.4 * 255, Colors.SkyBlue),
+            new ColorGradient.ColorStop(128, Colors.White),
+            // new ColorGradient.ColorStop(0.55 * 255, Colors.Yellow),
+            new ColorGradient.ColorStop(0.75 * 255, Colors.DarkOrange),
+            new ColorGradient.ColorStop(255, Colors.Red)
+        ]))
+    ]);
     
     public MainPage() {
         InitializeComponent();
         GraphicsView.Drawable = irDrawable;
-
+        
+        ColorGradientView.SetColorGradient(colorGradients.First().Value);
+        PickerGradient.ItemsSource = colorGradients.Keys.ToList();
+        PickerGradient.SelectedIndex = 0;
+        
         SetVisibilityOfImageViews(false);
     }
 
@@ -58,26 +86,28 @@ public partial class MainPage : ContentPage {
         int h = imgStream.GetHeight();
         int dataSize = w * h;
 
-        float maxValue = float.MinValue;
-        float minValue = float.MaxValue;
+        maxValue = float.MinValue;
+        minValue = float.MaxValue;
 
         for (int i = 0; i < dataSize; i++) {
             maxValue = Math.Max(maxValue, img[i]);
             minValue = Math.Min(minValue, img[i]);
         }
 
-        if (Math.Abs(maxValue - minValue) < 1) {
-            maxValue = minValue + 1;
+        float mapMax = scaleMaxValue < 0 ? maxValue : scaleMaxValue;
+        float mapMin = scaleMinValue < 0 ? minValue : scaleMinValue;
+        if (Math.Abs(mapMax - mapMin) < 1) {
+            mapMax = mapMin + 1;
         }
 
         var colors = new Color[w, h];
-        float scale = 255.0f / (maxValue - minValue);
+        float scale = 255.0f / (mapMax - mapMin);
 
         for (int i = 0; i < dataSize; i++) {
             int x = i % w;
             int y = i / w;
-            int c = (int)((img[i] - minValue) * scale);
-            colors[x, y] = Color.FromRgb(c, c, c);
+            int c = Math.Max(0, Math.Min(255, (int)((img[i] - minValue) * scale)));
+            colors[x, y] = ColorGradientView.GetColorGradient()!.GetColor(c);
         }
 
         MainThread.InvokeOnMainThreadAsync(() => {
@@ -121,8 +151,11 @@ public partial class MainPage : ContentPage {
     }
 
     private void SetVisibilityOfImageViews(bool visible) {
+        CtGradient.IsVisible = visible;
+        
         LblFrameNumber.IsVisible = visible;
         LblScale.IsVisible = visible;
+        LblRange.IsVisible = visible;
         
         PbZoomIn.IsVisible = visible;
         PbZoomOut.IsVisible = visible;
@@ -142,6 +175,10 @@ public partial class MainPage : ContentPage {
         SetVisibilityOfImageViews(true);
         LblFrameNumber.Text = $"Frame: {frameIndex + 1}/{frameCount}";
         LblScale.Text = $"Scale: {GraphicsView.Scale:F2}";
+        LblRange.Text = $"Range: {minValue:F2} - {maxValue:F2} K";
+        
+        TxtMinValue.Placeholder = minValue.ToString("F2");
+        TxtMaxValue.Placeholder = maxValue.ToString("F2");
         
         GraphicsView.WidthRequest = irDrawable.Colors.GetLength(0) * GraphicsView.Scale;
         GraphicsView.HeightRequest = irDrawable.Colors.GetLength(1) * GraphicsView.Scale;
@@ -171,5 +208,37 @@ public partial class MainPage : ContentPage {
                 (float) Math.Round((x + 1) * Zoom) - fx,
                 (float) Math.Round((y + 1) * Zoom) - fy);
         }
+    }
+
+    private void TxtMinValue_OnCompleted(object? sender, EventArgs e) {
+        UpdateScaleValues();
+    }
+
+    private void TxtMaxValue_OnCompleted(object? sender, EventArgs e) {
+        UpdateScaleValues();
+    }
+
+    [SuppressMessage("ReSharper", "ConditionalAccessQualifierIsNonNullableAccordingToAPIContract")]
+    private void UpdateScaleValues() {
+        if (TxtMinValue.Text?.Length > 0 && float.TryParse(TxtMinValue.Text, out float min)) {
+            scaleMinValue = min;
+        } else {
+            TxtMinValue.Text = "";
+            scaleMinValue = -1;
+        }
+        
+        if (TxtMaxValue.Text?.Length > 0 && float.TryParse(TxtMaxValue.Text, out float max)) {
+            scaleMaxValue = max;
+        } else {
+            TxtMaxValue.Text = "";
+            scaleMaxValue = -1;
+        }
+        
+        LoadFrame();
+    }
+
+    private void PickerGradient_OnSelectedIndexChanged(object? sender, EventArgs e) {
+        ColorGradientView.SetColorGradient(colorGradients[(PickerGradient.SelectedItem as string)!]);
+        LoadFrame();
     }
 }
