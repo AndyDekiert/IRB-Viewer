@@ -5,7 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:IRB_Viewer"
     Shell.FlyoutBehavior="Disabled"
-    Title="IRB_Viewer">
+    Title="IRB Viewer">
 
     <ShellContent
         Title="Home"
