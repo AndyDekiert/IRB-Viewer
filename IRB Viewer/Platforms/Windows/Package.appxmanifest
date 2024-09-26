@@ -6,7 +6,7 @@
   xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
   IgnorableNamespaces="uap rescap">
 
-  <Identity Name="maui-package-name-placeholder" Publisher="CN=User Name" Version="0.0.0.0" />
+  <Identity Name="IRBViewer" Publisher="CN=IRBViewerDeveloper" Version="1.0.0.0" />
 
   <mp:PhoneIdentity PhoneProductId="C2B61740-C506-4ABA-9A2D-220B339E5371" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
