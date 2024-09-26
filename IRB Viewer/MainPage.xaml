@@ -10,6 +10,9 @@
                 <ImageButton x:Name="PbOpen" Source="file_open_gray.png" Aspect="AspectFit"
                              HeightRequest="30" WidthRequest="30" Margin="10"
                              Clicked="PbOpen_OnClicked"/>
+                <ImageButton x:Name="PbSave" Source="save_gray.png" Aspect="AspectFit"
+                             HeightRequest="30" WidthRequest="30" Margin="10"
+                             Clicked="PbSave_OnClicked"/>
                 <ImageButton x:Name="PbZoomIn" Source="zoom_in_gray.png" Aspect="AspectFit"
                              HeightRequest="30" WidthRequest="30" Margin="10"
                              Clicked="PbZoomIn_OnClicked"/>
@@ -65,7 +68,7 @@
             
             <GraphicsView x:Name="GraphicsView"
                           HeightRequest="0" WidthRequest="0"
-                          Scale="1.5"
+                          Scale="1"
                           AnchorX="0" AnchorY="0"/>
         </VerticalStackLayout>
     </ScrollView>

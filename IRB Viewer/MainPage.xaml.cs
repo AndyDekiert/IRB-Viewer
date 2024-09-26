@@ -1,11 +1,13 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using CommunityToolkit.Maui.Storage;
 using IRB_Viewer.ColorMapping;
 
 namespace IRB_Viewer;
 
-public partial class MainPage : ContentPage {
+public partial class MainPage {
     private IrbFileFormat.IrbImg? imgStream;
     
+    private string? filePath;
     private int frameIndex;
     private int frameCount;
     private float minValue;
@@ -46,8 +48,8 @@ public partial class MainPage : ContentPage {
         try {
             FilePickerFileType customFileType = new(
                 new Dictionary<DevicePlatform, IEnumerable<string>> {
-                    { DevicePlatform.WinUI, [".irb"] }, // file extension
-                    { DevicePlatform.macOS, ["irb"] }, // UTType values
+                    { DevicePlatform.WinUI, [".irb"] },
+                    { DevicePlatform.macOS, ["irb"] }
                 });
             PickOptions options = new() {
                 PickerTitle = "Please select an Infratec .irb file",
@@ -56,11 +58,20 @@ public partial class MainPage : ContentPage {
             
             FilePicker.Default.PickAsync(options).ContinueWith(task => {
                 if (task.Result != null) {
+                    filePath = task.Result.FullPath;
                     LoadIrb(task.Result.FullPath);
                 }
             });
         } catch (Exception) {
             // ignored
+        }
+    }
+    
+    private async void PbSave_OnClicked(object? sender, EventArgs e) {
+        IScreenshotResult? screenshotResult = await GraphicsView.CaptureAsync();
+        if (screenshotResult != null) {
+            Stream stream = await screenshotResult.OpenReadAsync();
+            await FileSaver.Default.SaveAsync(Path.GetFileNameWithoutExtension(filePath) + ".png", stream);
         }
     }
 
@@ -117,14 +128,14 @@ public partial class MainPage : ContentPage {
     }
     
     private void PbZoomIn_OnClicked(object? sender, EventArgs e) {
-        GraphicsView.Scale += 0.25f;
-        if (GraphicsView.Scale > 3) GraphicsView.Scale = 3;
+        irDrawable.Zoom += 0.25f;
+        if (irDrawable.Zoom > 3) irDrawable.Zoom = 3;
         UpdateDisplay();
     }
 
     private void PbZoomOut_OnClicked(object? sender, EventArgs e) {
-        GraphicsView.Scale -= 0.25f;
-        if (GraphicsView.Scale < 0.5f) GraphicsView.Scale = 0.5f;
+        irDrawable.Zoom -= 0.25f;
+        if (irDrawable.Zoom < 0.5f) irDrawable.Zoom = 0.5f;
         UpdateDisplay();
     }
     
@@ -157,6 +168,7 @@ public partial class MainPage : ContentPage {
         LblScale.IsVisible = visible;
         LblRange.IsVisible = visible;
         
+        PbSave.IsVisible = visible;
         PbZoomIn.IsVisible = visible;
         PbZoomOut.IsVisible = visible;
         
@@ -174,20 +186,20 @@ public partial class MainPage : ContentPage {
 
         SetVisibilityOfImageViews(true);
         LblFrameNumber.Text = $"Frame: {frameIndex + 1}/{frameCount}";
-        LblScale.Text = $"Scale: {GraphicsView.Scale:F2}";
+        LblScale.Text = $"Scale: {irDrawable.Zoom:F2}";
         LblRange.Text = $"Range: {minValue:F2} - {maxValue:F2} K";
         
         TxtMinValue.Placeholder = minValue.ToString("F2");
         TxtMaxValue.Placeholder = maxValue.ToString("F2");
         
-        GraphicsView.WidthRequest = irDrawable.Colors.GetLength(0) * GraphicsView.Scale;
-        GraphicsView.HeightRequest = irDrawable.Colors.GetLength(1) * GraphicsView.Scale;
+        GraphicsView.WidthRequest = irDrawable.Colors.GetLength(0) * irDrawable.Zoom;
+        GraphicsView.HeightRequest = irDrawable.Colors.GetLength(1) * irDrawable.Zoom;
         GraphicsView.Invalidate();
     }
 
     private class IrDrawable : IDrawable {
         public Color[,]? Colors;
-        public float Zoom = -1f;
+        public float Zoom = 1.5f;
 
         public void Draw(ICanvas canvas, RectF dirtyRect) {
             if (Colors == null) return;
