@@ -18,18 +18,45 @@ public partial class MainPage {
 
     private readonly IrDrawable irDrawable = new();
 
+    private const int STEPS = 1023;
     private readonly Dictionary<string, ColorGradient> colorGradients = new([
-        new KeyValuePair<string, ColorGradient>("Black White", new ColorGradient([
+        new KeyValuePair<string, ColorGradient>("Black / White", new ColorGradient([
             new ColorGradient.ColorStop(0, Colors.Black),
-            new ColorGradient.ColorStop(255, Colors.White)
+            new ColorGradient.ColorStop(STEPS, Colors.White)
         ])),
-        new KeyValuePair<string, ColorGradient>("Blue Red", new ColorGradient([
-            new ColorGradient.ColorStop(0, Colors.Blue),
-            new ColorGradient.ColorStop(0.4 * 255, Colors.SkyBlue),
-            new ColorGradient.ColorStop(128, Colors.White),
-            // new ColorGradient.ColorStop(0.55 * 255, Colors.Yellow),
-            new ColorGradient.ColorStop(0.75 * 255, Colors.DarkOrange),
-            new ColorGradient.ColorStop(255, Colors.Red)
+        new KeyValuePair<string, ColorGradient>("Blue / Red", new ColorGradient([
+            new ColorGradient.ColorStop(0, Color.FromRgb(0, 0, 80)),
+            new ColorGradient.ColorStop(0.02 * STEPS, Color.FromRgb(0, 1, 128)),
+            new ColorGradient.ColorStop(0.1 * STEPS, Color.FromRgb(0, 44, 150)),
+            new ColorGradient.ColorStop(0.3 * STEPS, Color.FromRgb(2, 145, 200)),
+            new ColorGradient.ColorStop(0.5 * STEPS, Colors.White),
+            new ColorGradient.ColorStop(0.7 * STEPS, Color.FromRgb(252, 195, 12)),
+            new ColorGradient.ColorStop(STEPS, Color.FromRgb(213, 3, 0))
+        ])),
+        new KeyValuePair<string, ColorGradient>("Rainbow", new ColorGradient([
+            new ColorGradient.ColorStop(0, Color.FromRgb(0, 0, 11)),
+            new ColorGradient.ColorStop(0.1 * STEPS, Color.FromRgb(0, 32, 136)),
+            new ColorGradient.ColorStop(0.2 * STEPS, Color.FromRgb(0, 67, 238)),
+            new ColorGradient.ColorStop(0.3 * STEPS, Color.FromRgb(0, 131, 178)),
+            new ColorGradient.ColorStop(0.4 * STEPS, Color.FromRgb(0, 225, 0)),
+            new ColorGradient.ColorStop(0.5 * STEPS, Color.FromRgb(215, 252, 0)),
+            new ColorGradient.ColorStop(0.6 * STEPS, Color.FromRgb(252, 176, 0)),
+            new ColorGradient.ColorStop(0.7 * STEPS, Color.FromRgb(252, 63, 0)),
+            new ColorGradient.ColorStop(0.8 * STEPS, Color.FromRgb(252, 0, 114)),
+            new ColorGradient.ColorStop(0.9 * STEPS, Color.FromRgb(252, 16, 252)),
+            new ColorGradient.ColorStop(STEPS, Color.FromRgb(252, 242, 252))
+        ])),
+        new KeyValuePair<string, ColorGradient>("Black / White / Rainbow", new ColorGradient([
+            new ColorGradient.ColorStop(0, Colors.Black),
+            new ColorGradient.ColorStop(0.5 * STEPS, Colors.White),
+            new ColorGradient.ColorStop((0.5 + 0.125/2) * STEPS, Color.FromRgb(0, 67, 238)),
+            new ColorGradient.ColorStop((0.5 + 0.25/2) * STEPS, Color.FromRgb(0, 131, 178)),
+            new ColorGradient.ColorStop((0.5 + 0.375/2) * STEPS, Color.FromRgb(0, 225, 0)),
+            new ColorGradient.ColorStop((0.5 + 0.5/2) * STEPS, Color.FromRgb(215, 252, 0)),
+            new ColorGradient.ColorStop((0.5 + 0.625/2) * STEPS, Color.FromRgb(252, 176, 0)),
+            new ColorGradient.ColorStop((0.5 + 0.75/2) * STEPS, Color.FromRgb(252, 63, 0)),
+            new ColorGradient.ColorStop((0.5 + 0.875/2) * STEPS, Color.FromRgb(252, 0, 114)),
+            new ColorGradient.ColorStop(STEPS, Color.FromRgb(252, 16, 252))
         ]))
     ]);
     
@@ -112,12 +139,12 @@ public partial class MainPage {
         }
 
         var colors = new Color[w, h];
-        float scale = 255.0f / (mapMax - mapMin);
+        float scale = STEPS / (mapMax - mapMin);
 
         for (int i = 0; i < dataSize; i++) {
             int x = i % w;
             int y = i / w;
-            int c = Math.Max(0, Math.Min(255, (int)((img[i] - minValue) * scale)));
+            int c = Math.Max(0, Math.Min(STEPS, (int)((img[i] - minValue) * scale)));
             colors[x, y] = ColorGradientView.GetColorGradient()!.GetColor(c);
         }
 
