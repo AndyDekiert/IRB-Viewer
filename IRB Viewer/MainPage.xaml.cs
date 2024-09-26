@@ -144,7 +144,7 @@ public partial class MainPage {
         for (int i = 0; i < dataSize; i++) {
             int x = i % w;
             int y = i / w;
-            int c = Math.Max(0, Math.Min(STEPS, (int)((img[i] - minValue) * scale)));
+            int c = Math.Max(0, Math.Min(STEPS, (int)((img[i] - mapMin) * scale)));
             colors[x, y] = ColorGradientView.GetColorGradient()!.GetColor(c);
         }
 
